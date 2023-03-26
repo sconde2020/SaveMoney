@@ -1,0 +1,8 @@
+SaveMoney : 
+	Afficher les recettes et dépenses du mois
+	Afficher le détail de chaque recette et dépense
+	Ajouter une recette
+	Ajouter une dépense
+	Afficher l'épargne des derniers mois
+	
+	
