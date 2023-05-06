@@ -55,7 +55,8 @@ public class SaveMoneyController {
     }
 
     @GetMapping("/savings/find")
-    public ResponseEntity<Saving> getSaving(@RequestParam int year, @RequestParam int month) throws NoSuchSavingException {
+    public ResponseEntity<Saving> getSaving(@RequestParam int year, @RequestParam int month)
+            throws NoSuchSavingException {
         return new ResponseEntity<>(savingService.get(year, month), HttpStatus.FOUND);
     }
 
@@ -68,4 +69,25 @@ public class SaveMoneyController {
     public ResponseEntity<Expense> createExpense(@Valid @RequestBody Expense expense) {
         return new ResponseEntity<>(expenseService.create(expense), HttpStatus.CREATED);
     }
+
+    @PutMapping("/receipts")
+    public ResponseEntity<Receipt> updateReceipt(@Valid @RequestBody Receipt receipt) {
+        return new ResponseEntity<>(receiptService.update(receipt), HttpStatus.ACCEPTED);
+    }
+
+    @PutMapping("/expenses")
+    public ResponseEntity<Expense> updateExpense(@Valid @RequestBody Expense expense) {
+        return new ResponseEntity<>(expenseService.update(expense), HttpStatus.ACCEPTED);
+    }
+
+    @DeleteMapping("/receipts")
+    public ResponseEntity<Receipt> deleteReceipt(@Valid @RequestBody Receipt receipt) {
+        return new ResponseEntity<>(receiptService.delete(receipt), HttpStatus.ACCEPTED);
+    }
+
+    @DeleteMapping("/expenses")
+    public ResponseEntity<Expense> deleteReceipt(@Valid @RequestBody Expense expense) {
+        return new ResponseEntity<>(expenseService.delete(expense), HttpStatus.ACCEPTED);
+    }
+
 }

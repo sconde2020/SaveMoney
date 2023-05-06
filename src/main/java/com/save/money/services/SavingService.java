@@ -1,7 +1,9 @@
 package com.save.money.services;
 
 import com.save.money.exceptions.CreationException;
+import com.save.money.exceptions.DeleteException;
 import com.save.money.exceptions.NoSuchSavingException;
+import com.save.money.exceptions.UpdateException;
 import com.save.money.models.Saving;
 import com.save.money.repositories.SavingRepository;
 import lombok.extern.log4j.Log4j2;
@@ -50,11 +52,7 @@ public class SavingService {
 
             // Update existing saving
             if (saving != null) {
-                saving.setTotalReceipt(saving.getTotalReceipt() + newReceipt);
-                saving.setTotalExpense(saving.getTotalExpense() + newExpense);
-                saving.setValue(saving.getTotalReceipt() - saving.getTotalExpense());
-                repository.save(saving);
-                log.debug("Saving updated successfully!");
+                UpdateSaving(saving, newReceipt, newExpense);
             }
             // Or create new saving
             else {
@@ -72,8 +70,44 @@ public class SavingService {
             log.debug(endTrace());
         } catch (Exception e) {
             log.error(e.toString());
-            throw new CreationException("Error while updating saving!!!");
+            throw new UpdateException("Error while updating saving!!!");
         }
     }
 
+    public void delete(int savingYear, int savingMonth, double receipt, double expense) {
+        try {
+            log.debug(startTrace());
+            log.debug("Year = " + savingYear + " and month = " + savingMonth);
+
+            // Get the saving if it exists
+            Saving saving = repository.findBySavingYearAndSavingMonth(savingYear, savingMonth).orElse(null);
+
+            // Update existing saving
+            if (saving != null) {
+                UpdateSaving(saving, expense, receipt);
+                log.debug("Movement deleted from Saving successfully!");
+            }
+            else {
+                throw new UpdateException("No saving exists for this period");
+            }
+
+            log.debug(endTrace());
+        } catch (Exception e) {
+            log.error(e.toString());
+            throw new UpdateException("Error while deleting movement from saving!!!");
+        }
+    }
+
+    public void UpdateSaving(Saving saving, double newReceipt, double newExpense) {
+        try {
+            saving.setTotalReceipt(saving.getTotalReceipt() + newReceipt);
+            saving.setTotalExpense(saving.getTotalExpense() + newExpense);
+            saving.setValue(saving.getTotalReceipt() - saving.getTotalExpense());
+            repository.save(saving);
+            log.debug("Saving updated successfully!");
+        } catch (Exception e) {
+            log.error(e.toString());
+            throw new UpdateException("Error while updating saving!!!");
+        }
+    }
 }
