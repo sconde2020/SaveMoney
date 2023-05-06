@@ -1,7 +1,9 @@
 package com.save.money.services;
 
 import com.save.money.exceptions.CreationException;
+import com.save.money.exceptions.DeleteException;
 import com.save.money.exceptions.NoSuchExpenseException;
+import com.save.money.exceptions.UpdateException;
 import com.save.money.models.Expense;
 import com.save.money.repositories.ExpenseRepository;
 import lombok.extern.log4j.Log4j2;
@@ -60,6 +62,58 @@ public class ExpenseService {
         } catch (Exception e) {
             log.error(e.toString());
             throw new CreationException("Error while creating expense!!!");
+        }
+    }
+
+    @Transactional
+    public Expense update(Expense expense) throws UpdateException {
+        try {
+            log.debug(startTrace());
+
+            // Get old expense
+            Expense oldExpense = repository.getById(expense.getExpenseId());
+
+            // Save new expense
+            Expense newExpense = repository.save(expense);
+
+            // Update saving
+            // We cancel the old expense by adding it to receipts
+            savingService.update(oldExpense.getExpenseDate().getYear(),
+                    oldExpense.getExpenseDate().getMonthValue(),
+                    oldExpense.getAmount(),
+                    newExpense.getAmount());
+
+            log.debug("Expense updated successfully");
+            log.debug(endTrace());
+            return newExpense;
+        } catch (Exception e) {
+            log.error(e.toString());
+            throw new UpdateException("Error while updating expense!!!");
+        }
+    }
+
+    @Transactional
+    public Expense delete(Expense expense) throws DeleteException {
+        try {
+            log.debug(startTrace());
+
+            // Delete the expense
+            repository.delete(expense);
+
+            // Updating the saving
+            savingService.delete(
+                    expense.getExpenseDate().getYear(),
+                    expense.getExpenseDate().getMonthValue(),
+                    0,
+                    expense.getAmount()
+            );
+
+            log.debug("Expense deleted successfully");
+            log.debug(endTrace());
+            return expense;
+        } catch (Exception e) {
+            log.error(e.toString());
+            throw new DeleteException("Error while deleting expense!!!");
         }
     }
 }

@@ -1,7 +1,9 @@
 package com.save.money.services;
 
 import com.save.money.exceptions.CreationException;
+import com.save.money.exceptions.DeleteException;
 import com.save.money.exceptions.NoSuchReceiptException;
+import com.save.money.exceptions.UpdateException;
 import com.save.money.models.Receipt;
 import com.save.money.repositories.ReceiptRepository;
 import lombok.extern.log4j.Log4j2;
@@ -61,6 +63,57 @@ public class ReceiptService {
             log.error(e.toString());
             throw new CreationException("Error while creating receipt!!!");
         }
+    }
 
+    @Transactional
+    public Receipt update(Receipt receipt) throws UpdateException {
+        try {
+            log.debug(startTrace());
+
+            // Get old receipt
+            Receipt oldReceipt = repository.getById(receipt.getReceiptId());
+
+            // Save new receipt
+            Receipt newReceipt = repository.save(receipt);
+
+            // Update saving
+            // We cancel the old receipt by adding it to expenses
+            savingService.update(oldReceipt.getReceiptDate().getYear(),
+                    oldReceipt.getReceiptDate().getMonthValue(),
+                    newReceipt.getAmount(),
+                    oldReceipt.getAmount());
+
+            log.debug("Receipt updated successfully");
+            log.debug(endTrace());
+            return newReceipt;
+        } catch (Exception e) {
+            log.error(e.toString());
+            throw new UpdateException("Error while updating receipt!!!");
+        }
+    }
+
+    @Transactional
+    public Receipt delete(Receipt receipt) throws DeleteException {
+        try {
+            log.debug(startTrace());
+
+            // Delete the receipt
+            repository.delete(receipt);
+
+            // Update the saving
+            savingService.delete(
+                    receipt.getReceiptDate().getYear(),
+                    receipt.getReceiptDate().getMonthValue(),
+                    receipt.getAmount(),
+                    0
+
+            );
+            log.debug("Receipt deleted successfully");
+            log.debug(endTrace());
+            return receipt;
+        } catch (Exception e) {
+            log.error(e.toString());
+            throw new DeleteException("Error while deleting receipt!!!");
+        }
     }
 }
