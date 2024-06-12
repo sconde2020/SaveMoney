@@ -14,9 +14,6 @@ import javax.transaction.Transactional;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import static com.save.money.utils.Utils.endTrace;
-import static com.save.money.utils.Utils.startTrace;
-
 @Service
 @Log4j2
 public class ReceiptService {
@@ -26,19 +23,15 @@ public class ReceiptService {
     private SavingService savingService;
 
     public List<Receipt> getAll() {
-        log.debug(startTrace());
         List<Receipt> receiptList = repository.findAll();
-        log.debug("Number of receipts found: " + receiptList.size());
-        log.debug(endTrace());
+        log.debug(receiptList);
+        log.debug("Number of receipts found: {}", receiptList.size());
         return receiptList;
     }
 
     public Receipt get(long id) throws NoSuchReceiptException{
         try {
-            log.debug(startTrace());
-            Receipt receipt = repository.findById(id).orElseThrow();
-            log.debug(endTrace());
-            return receipt;
+            return repository.findById(id).orElseThrow();
         } catch (NoSuchElementException e) {
             log.error(e.toString());
             throw new NoSuchReceiptException("No receipt found with id <" + id + ">");
@@ -48,7 +41,6 @@ public class ReceiptService {
     @Transactional
     public Receipt create(Receipt receipt) throws CreationException {
         try {
-            log.debug(startTrace());
             Receipt savedReceipt = repository.save(receipt);
             savingService.update(
                     receipt.getReceiptDate().getYear(),
@@ -57,7 +49,6 @@ public class ReceiptService {
                     0
             );
             log.debug("Receipt created successfully");
-            log.debug(endTrace());
             return savedReceipt;
         } catch (Exception e) {
             log.error(e.toString());
@@ -68,8 +59,6 @@ public class ReceiptService {
     @Transactional
     public Receipt update(Receipt receipt) throws UpdateException {
         try {
-            log.debug(startTrace());
-
             // Get old receipt
             Receipt oldReceipt = repository.getById(receipt.getReceiptId());
 
@@ -84,7 +73,6 @@ public class ReceiptService {
                     oldReceipt.getAmount());
 
             log.debug("Receipt updated successfully");
-            log.debug(endTrace());
             return newReceipt;
         } catch (Exception e) {
             log.error(e.toString());
@@ -95,8 +83,6 @@ public class ReceiptService {
     @Transactional
     public Receipt delete(Receipt receipt) throws DeleteException {
         try {
-            log.debug(startTrace());
-
             // Delete the receipt
             repository.delete(receipt);
 
@@ -109,7 +95,6 @@ public class ReceiptService {
 
             );
             log.debug("Receipt deleted successfully");
-            log.debug(endTrace());
             return receipt;
         } catch (Exception e) {
             log.error(e.toString());

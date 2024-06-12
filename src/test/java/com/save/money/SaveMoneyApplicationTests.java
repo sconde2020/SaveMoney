@@ -8,6 +8,7 @@ class SaveMoneyApplicationTests {
 
 	@Test
 	void contextLoads() {
+
 	}
 
 }
