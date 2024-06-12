@@ -14,9 +14,6 @@ import javax.transaction.Transactional;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import static com.save.money.utils.Utils.endTrace;
-import static com.save.money.utils.Utils.startTrace;
-
 @Service
 @Log4j2
 public class ExpenseService {
@@ -26,19 +23,14 @@ public class ExpenseService {
     private SavingService savingService;
 
     public List<Expense> getAll() {
-        log.debug(startTrace());
         List<Expense> expenseList = repository.findAll();
-        log.debug("Number of expenses found: " + expenseList.size());
-        log.debug(endTrace());
+        log.debug("Number of expenses found: {}", expenseList.size());
         return expenseList;
     }
 
     public Expense get(long id) throws NoSuchExpenseException{
         try {
-            log.debug(startTrace());
-            Expense expense = repository.findById(id).orElseThrow();
-            log.debug(endTrace());
-            return expense;
+            return repository.findById(id).orElseThrow();
         } catch (NoSuchElementException e) {
             log.error(e.toString());
             throw new NoSuchExpenseException("No expense found with id <" + id + ">");
@@ -48,7 +40,6 @@ public class ExpenseService {
     @Transactional
     public Expense create(Expense expense) throws CreationException {
         try {
-            log.debug(startTrace());
             Expense savedExpense = repository.save(expense);
             savingService.update(
                     expense.getExpenseDate().getYear(),
@@ -57,7 +48,6 @@ public class ExpenseService {
                     expense.getAmount()
             );
             log.debug("Expense created successfully");
-            log.debug(endTrace());
             return savedExpense;
         } catch (Exception e) {
             log.error(e.toString());
@@ -68,8 +58,6 @@ public class ExpenseService {
     @Transactional
     public Expense update(Expense expense) throws UpdateException {
         try {
-            log.debug(startTrace());
-
             // Get old expense
             Expense oldExpense = repository.getById(expense.getExpenseId());
 
@@ -84,7 +72,6 @@ public class ExpenseService {
                     newExpense.getAmount());
 
             log.debug("Expense updated successfully");
-            log.debug(endTrace());
             return newExpense;
         } catch (Exception e) {
             log.error(e.toString());
@@ -95,8 +82,6 @@ public class ExpenseService {
     @Transactional
     public Expense delete(Expense expense) throws DeleteException {
         try {
-            log.debug(startTrace());
-
             // Delete the expense
             repository.delete(expense);
 
@@ -109,7 +94,6 @@ public class ExpenseService {
             );
 
             log.debug("Expense deleted successfully");
-            log.debug(endTrace());
             return expense;
         } catch (Exception e) {
             log.error(e.toString());

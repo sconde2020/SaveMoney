@@ -2,6 +2,7 @@ package com.save.money.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.save.money.config.CompositeKey;
+import io.swagger.annotations.ApiModel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,6 +14,7 @@ import javax.persistence.IdClass;
 import javax.persistence.Table;
 import java.io.Serializable;
 
+@ApiModel("Saving data")
 @Getter
 @Setter
 @NoArgsConstructor

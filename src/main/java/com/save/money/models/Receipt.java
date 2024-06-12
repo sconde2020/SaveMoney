@@ -1,6 +1,8 @@
 package com.save.money.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -11,6 +13,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
+@ApiModel("Receipt data")
 @Getter
 @Setter
 @ToString
@@ -31,6 +34,7 @@ public class Receipt {
 
     @NotBlank
     @Length(max=50, message="Property SOURCE can contain at most 50 characters")
+    @ApiModelProperty("Description")
     private String source;
 
     private LocalDate receiptDate = LocalDate.now();

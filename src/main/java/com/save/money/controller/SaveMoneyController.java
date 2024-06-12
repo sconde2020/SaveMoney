@@ -1,5 +1,6 @@
 package com.save.money.controller;
 
+import com.save.money.exceptions.CreationException;
 import com.save.money.exceptions.NoSuchExpenseException;
 import com.save.money.exceptions.NoSuchReceiptException;
 import com.save.money.exceptions.NoSuchSavingException;
@@ -30,18 +31,18 @@ public class SaveMoneyController {
     public String home() { return "Welcome on SaveMoney, Application to reach your saving goals !"; }
 
     @GetMapping("/receipts")
-    public List<Receipt> getAllReceipts() {
-        return receiptService.getAll();
+    public ResponseEntity<List<Receipt>> getAllReceipts() {
+        return new ResponseEntity<>(receiptService.getAll(), HttpStatus.OK);
     }
 
     @GetMapping("/expenses")
-    public List<Expense> getAllExpenses() {
-        return expenseService.getAll();
+    public ResponseEntity<List<Expense>> getAllExpenses() {
+        return new ResponseEntity<>(expenseService.getAll(), HttpStatus.OK);
     }
 
     @GetMapping("/savings")
-    public List<Saving> getAllSavings() {
-        return savingService.getAll();
+    public ResponseEntity<List<Saving>> getAllSavings() {
+        return new ResponseEntity<>(savingService.getAll(), HttpStatus.OK);
     }
 
     @GetMapping("/receipts/{id}")
@@ -61,12 +62,12 @@ public class SaveMoneyController {
     }
 
     @PostMapping("/receipts")
-    public ResponseEntity<Receipt> createReceipt(@Valid @RequestBody Receipt receipt) {
+    public ResponseEntity<Receipt> createReceipt(@Valid @RequestBody Receipt receipt) throws CreationException {
         return new ResponseEntity<>(receiptService.create(receipt), HttpStatus.CREATED);
     }
 
     @PostMapping("/expenses")
-    public ResponseEntity<Expense> createExpense(@Valid @RequestBody Expense expense) {
+    public ResponseEntity<Expense> createExpense(@Valid @RequestBody Expense expense) throws CreationException {
         return new ResponseEntity<>(expenseService.create(expense), HttpStatus.CREATED);
     }
 
